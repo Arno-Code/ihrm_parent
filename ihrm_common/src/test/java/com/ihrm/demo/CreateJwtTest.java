@@ -17,8 +17,10 @@ public class CreateJwtTest {
                 .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS256, "ihrm")
                 .claim("companyId","123456")
-                .claim("companyName","江苏传智播客教育股份有限公司")
-                ;
+                .claim("companyName","江苏传智播客教育股份有限公司");
+        for (int i = 0; i < 2; i++) {
+            jwtBuilder.claim(i+"",i+"");
+        }
         String token = jwtBuilder.compact();
         System.out.println(token);
     }

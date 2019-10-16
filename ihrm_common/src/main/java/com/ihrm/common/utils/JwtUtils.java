@@ -19,7 +19,7 @@ public class JwtUtils {
     //签名私钥
     private String key;
     //签名的失效时间
-    private Long ttl;
+    private Long ttl;//ms
 
     /**
      * 设置认证token
@@ -28,7 +28,7 @@ public class JwtUtils {
      *
      */
     public String createJwt(String id, String name, Map<String,Object> map) {
-        //1.设置失效时间
+        //1.创建失效时间
         long now = System.currentTimeMillis();//当前毫秒
         long exp = now + ttl;
         //2.创建jwtBuilder
@@ -39,7 +39,7 @@ public class JwtUtils {
         for(Map.Entry<String,Object> entry : map.entrySet()) {
             jwtBuilder.claim(entry.getKey(),entry.getValue());
         }
-        jwtBuilder.setExpiration(new Date(exp));
+        jwtBuilder.setExpiration(new Date(exp));//设置失效时间
         //4.创建token
         String token = jwtBuilder.compact();
         return token;

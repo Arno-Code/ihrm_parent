@@ -7,9 +7,11 @@ import com.ihrm.common.entity.ResultCode;
 
 import com.ihrm.common.exception.CommonException;
 import com.ihrm.common.utils.JwtUtils;
+import com.ihrm.domain.system.Permission;
 import com.ihrm.domain.system.response.ProfileResult;
 import com.ihrm.domain.system.User;
 import com.ihrm.domain.system.response.UserResult;
+import com.ihrm.system.service.PermissionService;
 import com.ihrm.system.service.RoleService;
 import com.ihrm.system.service.UserService;
 import io.jsonwebtoken.Claims;
@@ -33,6 +35,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PermissionService permissionService;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -166,8 +171,22 @@ public class UserController extends BaseController {
         //3.解析token
         Claims claims = jwtUtils.parseJwt(token);
         String userid = claims.getId();
+        //获取用户信息
         User user = userService.findById(userid);
-        ProfileResult result = new ProfileResult(user);
+        //更具不同类别的用户获取不同的权限
+
+        ProfileResult result = null;
+
+        if("user".equals(user.getLevel())) {
+            result = new ProfileResult(user);
+        }else {
+            Map map = new HashMap();
+            if("coAdmin".equals(user.getLevel())) {
+                map.put("enVisible","1");
+            }
+            List<Permission> list = permissionService.findAll(map);
+            result = new ProfileResult(user,list);
+        }
         return new Result(ResultCode.SUCCESS,result);
     }
 }
